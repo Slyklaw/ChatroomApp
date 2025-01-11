@@ -14,3 +14,7 @@ export const saveMessage = async (message) => {
 export const getMessages = async () => {
   return await db.messages.toArray();
 };
+
+export const clearMessages = async () => {
+  await db.messages.clear(); // Clear all messages from the Dexie database
+};

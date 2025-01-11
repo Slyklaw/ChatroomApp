@@ -9,7 +9,7 @@ import {
   StyleSheet,
 } from "react-native";
 import { createStore } from "tinybase";
-import { saveMessage, getMessages } from "./dexieDB";
+import { saveMessage, getMessages, clearMessages } from "./dexieDB";
 
 const store = createStore();
 
@@ -59,6 +59,11 @@ const Chatroom = () => {
     }
   };
 
+  const clearAllMessages = async () => {
+    await clearMessages(); // Clear messages from Dexie
+    setMessages([]); // Update local state to reflect cleared messages
+  };
+
   return (
     <View style={styles.container}>
       <FlatList
@@ -77,6 +82,7 @@ const Chatroom = () => {
         blurOnSubmit={false} // Prevent the TextInput from losing focus
       />
       <Button title="Send" onPress={sendMessage} />
+      <Button title="CLEAR ALL" onPress={clearAllMessages} color="red" />
     </View>
   );
 };
