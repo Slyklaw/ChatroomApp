@@ -77,11 +77,12 @@ const Chatroom = () => {
         value={input}
         onChangeText={setInput}
         placeholder="Type a message"
+        placeholderTextColor="#aaa" // Lighter color for placeholder text
         onSubmitEditing={sendMessage} // Send message on Enter key press
         returnKeyType="send" // Change the return key to "Send"
         blurOnSubmit={false} // Prevent the TextInput from losing focus
       />
-      <Button title="Send" onPress={sendMessage} />
+      <Button title="Send" onPress={sendMessage} color="#4CAF50" />
       <Button title="CLEAR ALL" onPress={clearAllMessages} color="red" />
     </View>
   );
@@ -90,19 +91,23 @@ const Chatroom = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: "#121212", // Dark background color
     padding: 10,
   },
   message: {
     padding: 10,
     borderBottomWidth: 1,
-    borderBottomColor: "#ccc",
+    borderBottomColor: "#444", // Darker border color
+    color: "#fff", // White text color for messages
   },
   input: {
     height: 40,
-    borderColor: "gray",
+    borderColor: "#444", // Darker border color
     borderWidth: 1,
     marginBottom: 10,
     paddingHorizontal: 10,
+    backgroundColor: "#1E1E1E", // Darker input background
+    color: "#fff", // White text color for input
   },
 });
 
