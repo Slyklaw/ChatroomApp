@@ -7,11 +7,9 @@ import {
   FlatList,
   Text,
   StyleSheet,
+  TouchableOpacity,
 } from "react-native";
-import { createStore } from "tinybase";
 import { saveMessage, getMessages, clearMessages } from "./dexieDB";
-
-const store = createStore();
 
 const Chatroom = () => {
   const [messages, setMessages] = useState([]);
@@ -21,41 +19,20 @@ const Chatroom = () => {
   useEffect(() => {
     const loadMessages = async () => {
       const savedMessages = await getMessages();
-      savedMessages.forEach((msg) => {
-        store.addRow('messages', msg.id, { text: msg.text });
-      });
       setMessages(savedMessages);
     };
 
     loadMessages();
-
-    // Set up a listener for changes in the messages table
-    const listener = store.addTablesListener('messages', () => {
-      const allMessages = store.getTable('messages');
-      setMessages(Object.values(allMessages));
-    });
-
-    return () => {
-      listener(); // Clean up the listener on unmount
-    };
   }, []);
 
   const sendMessage = () => {
     if (input.trim()) {
       const messageId = Date.now(); // Use timestamp as a unique ID
       const message = { id: messageId, text: input };
-      store.addRow('messages', messageId, { text: input });
       saveMessage(message);
-      setInput("");
-
-      // Update the local state immediately after sending the message
-      setMessages((prevMessages) => [
-        ...prevMessages,
-        { id: messageId, text: input },
-      ]);
-
-      // Focus back on the TextInput
-      inputRef.current.focus();
+      setMessages((prevMessages) => [...prevMessages, message]);
+      setInput(""); // Clear the input field
+      inputRef.current.focus(); // Focus back on the TextInput
     }
   };
 
@@ -71,19 +48,23 @@ const Chatroom = () => {
         renderItem={({ item }) => <Text style={styles.message}>{item.text}</Text>}
         keyExtractor={(item) => item.id.toString()} // Ensure the key is unique
       />
-      <TextInput
-        ref={inputRef} // Attach the ref to the TextInput
-        style={styles.input}
-        value={input}
-        onChangeText={setInput}
-        placeholder="Type a message"
-        placeholderTextColor="#aaa" // Lighter color for placeholder text
-        onSubmitEditing={sendMessage} // Send message on Enter key press
-        returnKeyType="send" // Change the return key to "Send"
-        blurOnSubmit={false} // Prevent the TextInput from losing focus
-      />
-      <Button title="Send" onPress={sendMessage} color="#4CAF50" />
-      <Button title="CLEAR ALL" onPress={clearAllMessages} color="red" />
+      <View style={styles.inputContainer}>
+        <TextInput
+          ref={inputRef} // Attach the ref to the TextInput
+          style={styles.input}
+          value={input}
+          onChangeText={setInput}
+          placeholder="Type a message"
+          placeholderTextColor="#aaa" // Lighter color for placeholder text
+          onSubmitEditing={sendMessage} // Send message on Enter key press
+          returnKeyType="send" // Change the return key to "Send"
+          blurOnSubmit={false} // Prevent the TextInput from losing focus
+        />
+        <Button title="Send" onPress={sendMessage} color="#4CAF50" />
+      </View>
+      <TouchableOpacity style={styles.clearButton} onPress={clearAllMessages}>
+        <Text style={styles.clearButtonText}>CLEAR ALL</Text>
+      </TouchableOpacity>
     </View>
   );
 };
@@ -99,15 +80,31 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: "#444", // Darker border color
     color: "#fff", // White text color for messages
+    fontSize: 18, // Font size for messages
+  },
+  inputContainer: {
+    flexDirection: "row", // Arrange children in a row
+    alignItems: "center", // Center vertically
+    marginBottom: 10, // Add some space below the input
   },
   input: {
-    height: 40,
+    flex: 1, // Take up remaining space
     borderColor: "#444", // Darker border color
     borderWidth: 1,
-    marginBottom: 10,
     paddingHorizontal: 10,
     backgroundColor: "#1E1E1E", // Darker input background
     color: "#fff", // White text color for input
+    fontSize: 18, // Font size for input
+  },
+  clearButton: {
+    backgroundColor: "#B22222", // Dark red color
+    width: "100%", // Full width for the clear button
+    padding: 10,
+    borderRadius: 5,
+    alignItems: "center",
+  },
+  clearButtonText: {
+    color: "#fff", // White text color for the clear button
   },
 });
 
